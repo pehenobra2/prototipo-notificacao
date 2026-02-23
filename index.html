@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSIMBTS - Regras de Notificação - Disparo Agendado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e5799 0%, #2989d8 50%, #7db9e8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Header amarelo */
+        .header {
+            background-color: #ffc107;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .breadcrumb {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            color: #333;
+            font-size: 13px;
+            background: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* Container principal */
+        .container {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header do formulário */
+        .form-header {
+            background: #e9ecef;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .form-header h2 {
+            color: #999;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .btn-cancelar {
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            padding: 0 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            position: relative;
+            background: #d0d0d0;
+            color: #666;
+            padding: 12px 30px;
+            margin-right: -10px;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 100%, 0 100%);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .tab:first-child {
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 100%, 0 100%);
+        }
+
+        .tab.active {
+            background: #4a7ba7;
+            color: white;
+            z-index: 1;
+        }
+
+        .tab:hover:not(.active) {
+            background: #b8b8b8;
+        }
+
+        /* Conteúdo */
+        .tab-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form groups */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-row.three-cols {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        label {
+            display: block;
+            color: #0066cc;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        label .required {
+            color: #d32f2f;
+        }
+
+        input[type="text"],
+        input[type="time"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #4a7ba7;
+            box-shadow: 0 0 0 2px rgba(74, 123, 167, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .char-count {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* Radio buttons e checkboxes */
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .radio-item,
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        input[type="radio"],
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* Fieldset de Agendamento */
+        .agendamento-fieldset {
+            border: 2px solid #4a7ba7;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+            background: #f8f9fa;
+        }
+
+        .agendamento-fieldset legend {
+            color: #4a7ba7;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 0 10px;
+        }
+
+        /* Tabela de Agendamentos Configurados */
+        .agendamentos-table-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            margin-bottom: 20px;
+        }
+
+        .agendamentos-table-header {
+            background: #f5f5f5;
+            padding: 12px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .agendamentos-table-header h3 {
+            color: #666;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .agendamentos-table-filters {
+            display: grid;
+            grid-template-columns: 80px 1fr 2fr 2fr;
+            gap: 15px;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            align-items: center;
+        }
+
+        .agendamentos-table-filters label {
+            font-size: 11px;
+            color: #999;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .agendamentos-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .agendamentos-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .agendamentos-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .agendamentos-table tbody tr.row-alt {
+            background: #f5f5f5;
+        }
+
+        .agendamentos-table tbody tr.row-alt:hover {
+            background: #ebebeb;
+        }
+
+        .agendamentos-table td {
+            padding: 12px 15px;
+            font-size: 12px;
+            color: #333;
+            vertical-align: top;
+        }
+
+        .td-action {
+            width: 80px;
+            text-align: center;
+        }
+
+        .btn-remove-row {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #dc3545;
+            transition: transform 0.2s;
+        }
+
+        .btn-remove-row:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-edit-row {
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #007bff;
+            transition: transform 0.2s;
+            margin-right: 5px;
+        }
+
+        .btn-edit-row:hover {
+            transform: scale(1.2);
+        }
+
+        .day-tag {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            margin: 2px;
+            font-weight: 500;
+        }
+
+        .horario-info {
+            line-height: 1.6;
+        }
+
+        .horario-tipo {
+            font-weight: 600;
+            color: #0066cc;
+            margin-bottom: 4px;
+        }
+
+        .horario-detalhe {
+            color: #666;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+
+        .agendamento-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .agendamento-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .agendamento-item-title {
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .btn-remove-agendamento {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .btn-remove-agendamento:hover {
+            background: #c82333;
+        }
+
+        .btn-add-agendamento {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .btn-add-agendamento:hover {
+            background: #218838;
+        }
+
+        .btn-save-agendamento {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 15px;
+        }
+
+        .btn-save-agendamento:hover {
+            background: #0056b3;
+        }
+
+        .week-days {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .day-checkbox {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .day-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .day-checkbox label {
+            font-size: 11px;
+            color: #666;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Campo de horário com modificador */
+        .time-field {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            background: #fafafa;
+        }
+
+        .time-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .time-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .time-option input[type="radio"] {
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+        .time-option-content {
+            flex: 1;
+        }
+
+        .time-option-label {
+            margin: 0;
+            color: #333;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .time-option input[type="time"] {
+            width: 150px;
+        }
+
+        /* Grid para horário dinâmico */
+        .dinamico-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: start;
+        }
+
+        .dinamico-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .dinamico-field label {
+            color: #0066cc;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .dinamico-field select {
+            width: 100%;
+        }
+
+        .modifier-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modifier-label {
+            color: #0066cc;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .modifier-input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .modifier-input-group select {
+            width: 120px;
+            padding: 6px;
+            font-size: 12px;
+        }
+
+        .modifier-input-group input[type="number"] {
+            width: 70px;
+            padding: 6px;
+            font-size: 12px;
+        }
+
+        .modifier-input-group span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Dual List Box */
+        .dual-list-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .list-box {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            height: 350px;
+        }
+
+        .list-box-header {
+            background: #f5f5f5;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .list-box-search {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .list-box-search input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .list-box-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .list-item {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            font-size: 12px;
+            color: #333;
+            transition: background 0.2s;
+        }
+
+        .list-item:hover {
+            background: #f8f9fa;
+        }
+
+        .list-item.selected {
+            background: #e3f2fd;
+            color: #0066cc;
+            font-weight: 500;
+        }
+
+        .transfer-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-transfer {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-transfer:hover {
+            background: #5a6268;
+        }
+
+        .btn-transfer:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Toggle switch */
+        .toggle-group {
+            display: flex;
+            gap: 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .toggle-btn {
+            padding: 6px 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: #4a7ba7;
+            color: white;
+        }
+
+        .toggle-btn:not(:last-child) {
+            border-right: 1px solid #ccc;
+        }
+
+        /* Audio layout */
+        .audio-section {
+            background: #fff8e1;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ffe082;
+            margin-bottom: 20px;
+        }
+
+        .audio-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .audio-icon {
+            color: #ff9800;
+            font-size: 20px;
+        }
+
+        .audio-text {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .message-list {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .message-item:hover {
+            background: #f8f9fa;
+        }
+
+        .message-item input[type="radio"] {
+            margin: 0;
+        }
+
+        /* Botões de ação */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 30px;
+            border-top: 1px solid #ddd;
+            background: #f8f9fa;
+        }
+
+        .btn {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 3px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Seção colapsável */
+        .collapsible-section {
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            background: #f5f5f5;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .section-header:hover {
+            background: #ebebeb;
+        }
+
+        .section-content {
+            padding: 20px 15px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+        }
+
+        /* Info helper */
+        .info-helper {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header amarelo -->
+    <div class="header">
+        <div class="header-left">
+            <span class="header-title">📋 REGRAS DE NOTIFICAÇÃO</span>
+            <span class="breadcrumb"> > INCLUSÃO</span>
+        </div>
+        <div class="header-right">
+            <span>🔔</span>
+            <span>📞</span>
+            <span>❓</span>
+            <span>✉️</span>
+            <span>📦</span>
+            <span class="user-info">👤 Olá, ADMINISTRADOR</span>
+        </div>
+    </div>
+
+    <!-- Container principal -->
+    <div class="container">
+        <!-- Header do formulário -->
+        <div class="form-header">
+            <h2>REGRAS DE NOTIFICAÇÃO > INCLUSÃO</h2>
+            <button class="btn-cancelar">CANCELAR</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab(0)">INFORMAÇÕES BÁSICAS</div>
+            <div class="tab" onclick="showTab(1)">DESTINATÁRIOS</div>
+            <div class="tab" onclick="showTab(2)">LAYOUTS</div>
+            <div class="tab" onclick="showTab(3)">REVISÃO</div>
+        </div>
+
+        <!-- Tab 1: Informações Básicas -->
+        <div class="tab-content active">
+            <div class="form-group">
+                <label>Nome <span class="required">*</span></label>
+                <input type="text" placeholder="Digite o nome da regra">
+            </div>
+
+            <div class="form-group">
+                <label>Descrição <span class="required">*</span></label>
+                <textarea placeholder="Digite a descrição"></textarea>
+                <div class="char-count">500 caracteres.</div>
+            </div>
+
+            <div class="form-group">
+                <label>Situação <span class="required">*</span></label>
+                <input type="text" value="DESABILITADO" disabled style="background: #f5f5f5;">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Condição da Dependência <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="condicao" id="aguardando" value="aguardando">
+                            <label for="aguardando" style="margin: 0; color: #333; font-weight: 400;">Aguardando Tratamento</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="condicao" id="tratamento" value="tratamento">
+                            <label for="tratamento" style="margin: 0; color: #333; font-weight: 400;">Em Tratamento</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Meio de Notificação <span class="required">*</span></label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="email" value="email">
+                            <label for="email" style="margin: 0; color: #333; font-weight: 400;">E-mail</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sms" value="sms">
+                            <label for="sms" style="margin: 0; color: #333; font-weight: 400;">SMS</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="popup" value="popup">
+                            <label for="popup" style="margin: 0; color: #333; font-weight: 400;">Pop-up</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="audiobidirecional" value="audiobidirecional" onchange="toggleAudioFields(this)">
+                            <label for="audiobidirecional" style="margin: 0; color: #333; font-weight: 400;">Áudio Bidirecional</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Objeto da Notificação <span class="required">*</span></label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" name="objeto" id="conclusao" value="conclusao">
+                        <label for="conclusao" style="margin: 0; color: #333; font-weight: 400;">Conclusão do Evento</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" name="objeto" id="evento" value="evento">
+                        <label for="evento" style="margin: 0; color: #333; font-weight: 400;">Evento</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" name="objeto" id="informacao" value="informacao">
+                        <label for="informacao" style="margin: 0; color: #333; font-weight: 400;">Informação</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" name="objeto" id="ordem" value="ordem">
+                        <label for="ordem" style="margin: 0; color: #333; font-weight: 400;">Ordem de Serviço</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" name="objeto" id="prioridade" value="prioridade">
+                        <label for="prioridade" style="margin: 0; color: #333; font-weight: 400;">Prioridade</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" name="objeto" id="acao" value="acao">
+                        <label for="acao" style="margin: 0; color: #333; font-weight: 400;">Ação</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tipo de Ação (fora do fieldset) -->
+            <div class="form-group">
+                <label>Tipo da Ação <span class="required">*</span></label>
+                <select id="tipoAcao" onchange="toggleAgendamentoFieldset(this)">
+                    <option value="">Selecione...</option>
+                    <option value="agendado">Disparo Agendado</option>
+                    <option value="imediato">Disparo Imediato</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tempo para Iniciar a Notificação (min.) <span class="required">*</span></label>
+                    <input type="number" id="tempoIniciar" value="0" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Tempo de Intermitência entre Notificações <span class="required">*</span></label>
+                    <select>
+                        <option value="">---</option>
+                        <option value="5">5 minutos</option>
+                        <option value="10">10 minutos</option>
+                        <option value="15">15 minutos</option>
+                        <option value="30">30 minutos</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Fieldset de Agendamento -->
+            <fieldset id="agendamentoFieldset" class="agendamento-fieldset" style="display: none;">
+                <legend>⏰ Configurações de Agendamento</legend>
+
+                <!-- Tabela de Agendamentos Configurados -->
+                <div class="agendamentos-table-container" id="agendamentosTableContainer" style="display: none;">
+                    <div class="agendamentos-table-header">
+                        <h3>AGENDAMENTOS CONFIGURADOS</h3>
+                    </div>
+
+                    <div class="agendamentos-table-filters">
+                        <label>AÇÕES</label>
+                        <label>DIAS DA SEMANA</label>
+                        <label>HORÁRIO DE INÍCIO</label>
+                        <label>HORÁRIO DE TÉRMINO</label>
+                    </div>
+
+                    <table class="agendamentos-table">
+                        <tbody id="agendamentosTableBody">
+                            <!-- Linhas serão adicionadas dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Formulário de Novo Agendamento -->
+                <div id="agendamentoForm">
+                    <div class="agendamento-item">
+                        <div class="agendamento-item-header">
+                            <span class="agendamento-item-title" id="formTitle">📅 Novo Agendamento</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Dia da Semana</label>
+                            <div class="week-days">
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="dom" value="0">
+                                    <label for="dom">Dom</label>
+                                </div>
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="seg" value="1">
+                                    <label for="seg">Seg</label>
+                                </div>
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="ter" value="2">
+                                    <label for="ter">Ter</label>
+                                </div>
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="qua" value="3">
+                                    <label for="qua">Qua</label>
+                                </div>
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="qui" value="4">
+                                    <label for="qui">Qui</label>
+                                </div>
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="sex" value="5">
+                                    <label for="sex">Sex</label>
+                                </div>
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="sab" value="6">
+                                    <label for="sab">Sáb</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Horário de Início -->
+                        <div class="form-group">
+                            <label>Horário de Início <span class="required">*</span></label>
+                            <div class="time-field">
+                                <div class="time-options">
+                                    <div class="time-option">
+                                        <input type="radio" name="horaInicio" id="horaDefinidaInicio" value="definida" checked onchange="toggleDynamicFields('inicio')">
+                                        <div class="time-option-content">
+                                            <label class="time-option-label" for="horaDefinidaInicio">Hora Definida</label>
+                                            <input type="time" id="timeInputInicio" value="08:00" style="width: 150px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="time-option">
+                                        <input type="radio" name="horaInicio" id="horarioDinamicoInicio" value="dinamico" onchange="toggleDynamicFields('inicio')">
+                                        <div class="time-option-content">
+                                            <label class="time-option-label" for="horarioDinamicoInicio">Horário Dinâmico</label>
+                                            <div class="dinamico-grid">
+                                                <div class="dinamico-field">
+                                                    <label>Selecione o Horário de Referência</label>
+                                                    <select id="dinamicoSelectInicio" disabled>
+                                                        <option value="">Selecione...</option>
+                                                        <option value="exp_interno_inicio">Hora Início do Expediente Interno da Dependência</option>
+                                                        <option value="exp_interno_fim">Hora Fim do Expediente Interno da Dependência</option>
+                                                        <option value="exp_externo_inicio">Hora Início do Expediente Externo da Dependência</option>
+                                                        <option value="exp_externo_fim">Hora Fim do Expediente Externo da Dependência</option>
+                                                        <option value="exp_auto_inicio">Hora Início do Expediente Autoatendimento da Dependência</option>
+                                                        <option value="exp_auto_fim">Hora Fim do Expediente Autoatendimento da Dependência</option>
+                                                    </select>
+                                                </div>
+                                                <div class="modifier-group">
+                                                    <label class="modifier-label">Modificador</label>
+                                                    <div class="modifier-input-group">
+                                                        <select id="modifierOpInicio" disabled>
+                                                            <option value="sub" selected>Subtrair</option>
+                                                            <option value="add">Adicionar</option>
+                                                        </select>
+                                                        <input type="number" id="modifierValInicio" min="0" max="23" value="0" disabled>
+                                                        <span>hora(s)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Horário de Término -->
+                        <div class="form-group">
+                            <label>Horário de Término <span class="required">*</span></label>
+                            <div class="time-field">
+                                <div class="time-options">
+                                    <div class="time-option">
+                                        <input type="radio" name="horaFim" id="horaDefinidaFim" value="definida" checked onchange="toggleDynamicFields('fim')">
+                                        <div class="time-option-content">
+                                            <label class="time-option-label" for="horaDefinidaFim">Hora Definida</label>
+                                            <input type="time" id="timeInputFim" value="18:00" style="width: 150px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="time-option">
+                                        <input type="radio" name="horaFim" id="horarioDinamicoFim" value="dinamico" onchange="toggleDynamicFields('fim')">
+                                        <div class="time-option-content">
+                                            <label class="time-option-label" for="horarioDinamicoFim">Horário Dinâmico</label>
+                                            <div class="dinamico-grid">
+                                                <div class="dinamico-field">
+                                                    <label>Selecione o Horário de Referência</label>
+                                                    <select id="dinamicoSelectFim" disabled>
+                                                        <option value="">Selecione...</option>
+                                                        <option value="exp_interno_inicio">Hora Início do Expediente Interno da Dependência</option>
+                                                        <option value="exp_interno_fim">Hora Fim do Expediente Interno da Dependência</option>
+                                                        <option value="exp_externo_inicio">Hora Início do Expediente Externo da Dependência</option>
+                                                        <option value="exp_externo_fim">Hora Fim do Expediente Externo da Dependência</option>
+                                                        <option value="exp_auto_inicio">Hora Início do Expediente Autoatendimento da Dependência</option>
+                                                        <option value="exp_auto_fim">Hora Fim do Expediente Autoatendimento da Dependência</option>
+                                                    </select>
+                                                </div>
+                                                <div class="modifier-group">
+                                                    <label class="modifier-label">Modificador</label>
+                                                    <div class="modifier-input-group">
+                                                        <select id="modifierOpFim" disabled>
+                                                            <option value="add" selected>Adicionar</option>
+                                                            <option value="sub">Subtrair</option>
+                                                        </select>
+                                                        <input type="number" id="modifierValFim" min="0" max="23" value="0" disabled>
+                                                        <span>hora(s)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-save-agendamento" onclick="salvarAgendamento()">💾 Salvar Configuração</button>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <!-- Tab 2: Destinatários -->
+        <div class="tab-content">
+            
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #666; font-size: 13px; font-weight: 600; margin-bottom: 15px;">DESTINATÁRIOS PADRÃO</h3>
+                
+                <div class="form-row three-cols" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Usuário da Controladora <span class="required">*</span> 📧</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" onclick="toggleActive(this)">NÃO</button>
+                            <button class="toggle-btn" onclick="toggleActive(this)">SIM</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Usuário de Acesso Físico <span class="required">*</span> 📧</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" onclick="toggleActive(this)">NÃO</button>
+                            <button class="toggle-btn" onclick="toggleActive(this)">SIM</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pessoas da Dependência <span class="required">*</span> 📧 💬 🔔</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" onclick="toggleActive(this)">NÃO</button>
+                            <button class="toggle-btn" onclick="toggleActive(this)">SIM</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row three-cols" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Contatos Comerciais da Dependência <span class="required">*</span> 📧 💬</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" onclick="toggleActive(this)">NÃO</button>
+                            <button class="toggle-btn" onclick="toggleActive(this)">SIM</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Usuário Atribuído à Dependência <span class="required">*</span> 📧 📱 💬</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" onclick="toggleActive(this)">NÃO</button>
+                            <button class="toggle-btn" onclick="toggleActive(this)">SIM</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Funcionário do Cofre <span class="required">*</span> 📧 💬 📱</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" onclick="toggleActive(this)">NÃO</button>
+                            <button class="toggle-btn" onclick="toggleActive(this)">SIM</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ambientes da Dependência <span class="required">*</span> 🔊</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" onclick="toggleActive(this)">NÃO</button>
+                            <button class="toggle-btn" onclick="toggleActive(this)">SIM</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div>
+                    <img src="imagem.jpg"/>
+                </div>
+
+            <!-- Campos específicos de Áudio Bidirecional -->
+            <div id="audioDestinatarioFields" style="display: none;">
+                
+                <!-- Dual List para Ambientes -->
+                <div class="form-group">
+                    <label>Lista de Ambientes <span class="required">*</span></label>
+                    <div class="info-helper">Componente disponível em: Cadastro > Tipo de Dependência > Manter Tipo de Dependência</div>
+                    
+                    <div class="dual-list-container">
+                        <div class="list-box">
+                            <div class="list-box-header">Não Selecionados</div>
+                            <div class="list-box-search">
+                                <input type="text" placeholder="🔍 Pesquisar...">
+                            </div>
+                            <div class="list-box-items" id="availableAmbientesList">
+                                <div class="list-item" onclick="selectItem(this, 'availableAmb')">[BOSCH-CAM-IP] SALÃO BBTS</div>
+                                <div class="list-item" onclick="selectItem(this, 'availableAmb')">[CAMERAS IP]</div>
+                                <div class="list-item" onclick="selectItem(this, 'availableAmb')">[DAHUA-XVR-222] SALÃO BBTS</div>
+                                <div class="list-item" onclick="selectItem(this, 'availableAmb')">[GEOVISION-DVR-230] SALÃO BBTS</div>
+                                <div class="list-item" onclick="selectItem(this, 'availableAmb')">[HIKVISION-NVR-29.7] SHOW ROOM</div>
+                                <div class="list-item" onclick="selectItem(this, 'availableAmb')">[HIKVISION-DVR-210] SALÃO BBTS</div>
+                                <div class="list-item" onclick="selectItem(this, 'availableAmb')">[HIKVISION-NVR-214] SALÃO BBTS</div>
+                                <div class="list-item" onclick="selectItem(this, 'availableAmb')">[HIKVISION-NVR-216] SALÃO BBTS</div>
+                                <div class="list-item" onclick="selectItem(this, 'availableAmb')">[HIKVISION-NVR-217] SALÃO BBTS</div>
+                            </div>
+                        </div>
+
+                        <div class="transfer-buttons">
+                            <button type="button" class="btn-transfer" onclick="moveAmbToSelected()">►</button>
+                            <button type="button" class="btn-transfer" onclick="moveAllAmbToSelected()">►►</button>
+                            <button type="button" class="btn-transfer" onclick="moveAmbToAvailable()">◄</button>
+                            <button type="button" class="btn-transfer" onclick="moveAllAmbToAvailable()">◄◄</button>
+                        </div>
+
+                        <div class="list-box">
+                            <div class="list-box-header">Selecionados</div>
+                            <div class="list-box-search">
+                                <input type="text" placeholder="🔍 Pesquisar...">
+                            </div>
+                            <div class="list-box-items" id="selectedAmbientesList">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tab 3: Layouts -->
+        <div class="tab-content">
+            <div class="collapsible-section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <span>▼ LAYOUT AUDIOBIDIRECIONAL</span>
+                </div>
+                <div class="section-content">
+                    <div class="audio-section">
+                        <div class="audio-header">
+                            <span class="audio-icon">⚠️</span>
+                            <span class="audio-text">Selecione a Mensagem que Será Disparada para o Ambiente da Dependência.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="font-size: 12px; color: #666; margin-bottom: 10px;">MENSAGEM</label>
+                            <div class="message-list">
+                                <div class="message-item">
+                                    <input type="radio" name="audioMessage" id="msg1" value="1">
+                                    <label for="msg1" style="margin: 0; color: #333; font-weight: 400;">Teste mensagem de motivação 1</label>
+                                </div>
+                                <div class="message-item">
+                                    <input type="radio" name="audioMessage" id="msg2" value="2">
+                                    <label for="msg2" style="margin: 0; color: #333; font-weight: 400;">Teste mensagem de sabedoria 1.</label>
+                                </div>
+                                <div class="message-item">
+                                    <input type="radio" name="audioMessage" id="msg3" value="3">
+                                    <label for="msg3" style="margin: 0; color: #333; font-weight: 400;">Teste mensagem de reflexão 1.</label>
+                                </div>
+                                <div class="message-item">
+                                    <input type="radio" name="audioMessage" id="msg4" value="4">
+                                    <label for="msg4" style="margin: 0; color: #333; font-weight: 400;">Teste mensagem de otimismo 1.</label>
+                                </div>
+                                <div class="message-item">
+                                    <input type="radio" name="audioMessage" id="msg5" value="5">
+                                    <label for="msg5" style="margin: 0; color: #333; font-weight: 400;">Aviso de encerramento - Porta de enrolar SAA</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-section" style="opacity: 0.5;">
+                <div class="section-header">
+                    <span>▶ LAYOUT E-MAIL</span>
+                </div>
+            </div>
+
+            <div class="collapsible-section" style="opacity: 0.5;">
+                <div class="section-header">
+                    <span>▶ LAYOUT SMS</span>
+                </div>
+            </div>
+
+            <div class="collapsible-section" style="opacity: 0.5;">
+                <div class="section-header">
+                    <span>▶ LAYOUT POP-UP</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Revisão -->
+        <div class="tab-content">
+            <div style="padding: 40px; text-align: center; color: #999;">
+                <h3>Revisão das informações</h3>
+                <p style="margin-top: 20px;">Aqui será exibido um resumo de todas as configurações antes de salvar.</p>
+            </div>
+        </div>
+
+        <!-- Botões de ação -->
+        <div class="form-actions">
+            <button class="btn btn-secondary">ANTERIOR</button>
+            <button class="btn btn-primary">PRÓXIMO</button>
+        </div>
+    </div>
+
+    <script>
+        // Array para armazenar agendamentos
+        let agendamentos = [];
+        let editingIndex = null;
+
+        // Mapeamento de nomes dos dias
+        const diasSemana = {
+            '0': 'Dom',
+            '1': 'Seg',
+            '2': 'Ter',
+            '3': 'Qua',
+            '4': 'Qui',
+            '5': 'Sex',
+            '6': 'Sáb'
+        };
+
+        // Mapeamento de horários dinâmicos
+        const horariosDinamicos = {
+            'exp_interno_inicio': 'Hora Início Exp. Interno',
+            'exp_interno_fim': 'Hora Fim Exp. Interno',
+            'exp_externo_inicio': 'Hora Início Exp. Externo',
+            'exp_externo_fim': 'Hora Fim Exp. Externo',
+            'exp_auto_inicio': 'Hora Início Exp. Autoatendimento',
+            'exp_auto_fim': 'Hora Fim Exp. Autoatendimento'
+        };
+
+        // Controle de tabs
+        function showTab(index) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('active');
+                    contents[i].classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                    contents[i].classList.remove('active');
+                }
+            });
+        }
+
+        // Toggle fieldset de agendamento
+        function toggleAgendamentoFieldset(select) {
+            const fieldset = document.getElementById('agendamentoFieldset');
+            const tempoIniciar = document.getElementById('tempoIniciar');
+            
+            if (select.value === 'agendado') {
+                fieldset.style.display = 'block';
+                tempoIniciar.value = '0';
+                tempoIniciar.disabled = true;
+            } else {
+                fieldset.style.display = 'none';
+                tempoIniciar.disabled = false;
+            }
+        }
+
+        // Toggle de campos dinâmicos
+        function toggleDynamicFields(tipo) {
+            const radioName = `hora${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`;
+            const selectedRadio = document.querySelector(`input[name="${radioName}"]:checked`);
+            const value = selectedRadio ? selectedRadio.value : 'definida';
+
+            const selectField = document.getElementById(`dinamicoSelect${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            const modifierOp = document.getElementById(`modifierOp${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            const modifierVal = document.getElementById(`modifierVal${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+
+            if (value === 'dinamico') {
+                selectField.disabled = false;
+                modifierOp.disabled = false;
+                modifierVal.disabled = false;
+            } else {
+                selectField.disabled = true;
+                modifierOp.disabled = true;
+                modifierVal.disabled = true;
+            }
+        }
+
+        // Salvar configuração de agendamento
+        function salvarAgendamento() {
+            // Coletar dias selecionados
+            const dias = [];
+            document.querySelectorAll('#agendamentoForm input[type="checkbox"]:checked').forEach(cb => {
+                dias.push(cb.value);
+            });
+
+            if (dias.length === 0) {
+                alert('Selecione pelo menos um dia da semana!');
+                return;
+            }
+
+            // Coletar horário de início
+            const tipoInicio = document.querySelector('input[name="horaInicio"]:checked').value;
+            let horarioInicio = {};
+            
+            if (tipoInicio === 'definida') {
+                horarioInicio = {
+                    tipo: 'definida',
+                    valor: document.getElementById('timeInputInicio').value
+                };
+            } else {
+                horarioInicio = {
+                    tipo: 'dinamico',
+                    referencia: document.getElementById('dinamicoSelectInicio').value,
+                    operacao: document.getElementById('modifierOpInicio').value,
+                    horas: document.getElementById('modifierValInicio').value
+                };
+            }
+
+            // Coletar horário de término
+            const tipoFim = document.querySelector('input[name="horaFim"]:checked').value;
+            let horarioFim = {};
+            
+            if (tipoFim === 'definida') {
+                horarioFim = {
+                    tipo: 'definida',
+                    valor: document.getElementById('timeInputFim').value
+                };
+            } else {
+                horarioFim = {
+                    tipo: 'dinamico',
+                    referencia: document.getElementById('dinamicoSelectFim').value,
+                    operacao: document.getElementById('modifierOpFim').value,
+                    horas: document.getElementById('modifierValFim').value
+                };
+            }
+
+            const agendamento = {
+                dias: dias,
+                horarioInicio: horarioInicio,
+                horarioFim: horarioFim
+            };
+
+            if (editingIndex !== null) {
+                agendamentos[editingIndex] = agendamento;
+                editingIndex = null;
+            } else {
+                agendamentos.push(agendamento);
+            }
+
+            renderizarTabela();
+            limparFormulario();
+        }
+
+        // Renderizar tabela de agendamentos
+        function renderizarTabela() {
+            const tbody = document.getElementById('agendamentosTableBody');
+            const container = document.getElementById('agendamentosTableContainer');
+            
+            if (agendamentos.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            tbody.innerHTML = '';
+
+            agendamentos.forEach((agendamento, index) => {
+                const tr = document.createElement('tr');
+                if (index % 2 === 1) tr.classList.add('row-alt');
+
+                // Coluna Ações
+                const tdAcoes = document.createElement('td');
+                tdAcoes.className = 'td-action';
+                tdAcoes.innerHTML = `
+                    <button type="button" class="btn-edit-row" onclick="editarAgendamento(${index})" title="Editar">✏️</button>
+                    <button type="button" class="btn-remove-row" onclick="removerAgendamento(${index})" title="Remover">❌</button>
+                `;
+
+                // Coluna Dias da Semana
+                const tdDias = document.createElement('td');
+                tdDias.innerHTML = agendamento.dias.map(d => `<span class="day-tag">${diasSemana[d]}</span>`).join(' ');
+
+                // Coluna Horário de Início
+                const tdInicio = document.createElement('td');
+                tdInicio.innerHTML = formatarHorario(agendamento.horarioInicio);
+
+                // Coluna Horário de Término
+                const tdFim = document.createElement('td');
+                tdFim.innerHTML = formatarHorario(agendamento.horarioFim);
+
+                tr.appendChild(tdAcoes);
+                tr.appendChild(tdDias);
+                tr.appendChild(tdInicio);
+                tr.appendChild(tdFim);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Formatarhora horário para exibição
+        function formatarHorario(horario) {
+            if (horario.tipo === 'definida') {
+                return `<div class="horario-info">
+                    <div class="horario-tipo">⏰ Hora Definida</div>
+                    <div class="horario-detalhe">${horario.valor}</div>
+                </div>`;
+            } else {
+                const nomeReferencia = horariosDinamicos[horario.referencia] || horario.referencia;
+                const operacaoTexto = horario.operacao === 'add' ? 'Adicionar' : 'Subtrair';
+                return `<div class="horario-info">
+                    <div class="horario-tipo">🔄 Horário Dinâmico</div>
+                    <div class="horario-detalhe">${nomeReferencia}</div>
+                    <div class="horario-detalhe">${operacaoTexto} ${horario.horas} hora(s)</div>
+                </div>`;
+            }
+        }
+
+        // Editar agendamento
+        function editarAgendamento(index) {
+            editingIndex = index;
+            const agendamento = agendamentos[index];
+
+            // Marcar dias
+            document.querySelectorAll('#agendamentoForm input[type="checkbox"]').forEach(cb => {
+                cb.checked = agendamento.dias.includes(cb.value);
+            });
+
+            // Configurar horário de início
+            if (agendamento.horarioInicio.tipo === 'definida') {
+                document.getElementById('horaDefinidaInicio').checked = true;
+                document.getElementById('timeInputInicio').value = agendamento.horarioInicio.valor;
+                toggleDynamicFields('inicio');
+            } else {
+                document.getElementById('horarioDinamicoInicio').checked = true;
+                document.getElementById('dinamicoSelectInicio').value = agendamento.horarioInicio.referencia;
+                document.getElementById('modifierOpInicio').value = agendamento.horarioInicio.operacao;
+                document.getElementById('modifierValInicio').value = agendamento.horarioInicio.horas;
+                toggleDynamicFields('inicio');
+            }
+
+            // Configurar horário de término
+            if (agendamento.horarioFim.tipo === 'definida') {
+                document.getElementById('horaDefinidaFim').checked = true;
+                document.getElementById('timeInputFim').value = agendamento.horarioFim.valor;
+                toggleDynamicFields('fim');
+            } else {
+                document.getElementById('horarioDinamicoFim').checked = true;
+                document.getElementById('dinamicoSelectFim').value = agendamento.horarioFim.referencia;
+                document.getElementById('modifierOpFim').value = agendamento.horarioFim.operacao;
+                document.getElementById('modifierValFim').value = agendamento.horarioFim.horas;
+                toggleDynamicFields('fim');
+            }
+
+            document.getElementById('formTitle').textContent = '✏️ Editando Agendamento';
+            document.querySelector('.btn-save-agendamento').textContent = '💾 Atualizar Configuração';
+        }
+
+        // Remover agendamento
+        function removerAgendamento(index) {
+            if (confirm('Deseja realmente remover esta configuração de agendamento?')) {
+                agendamentos.splice(index, 1);
+                renderizarTabela();
+            }
+        }
+
+        // Limpar formulário
+        function limparFormulario() {
+            document.querySelectorAll('#agendamentoForm input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.getElementById('horaDefinidaInicio').checked = true;
+            document.getElementById('timeInputInicio').value = '08:00';
+            document.getElementById('horaDefinidaFim').checked = true;
+            document.getElementById('timeInputFim').value = '18:00';
+            toggleDynamicFields('inicio');
+            toggleDynamicFields('fim');
+            
+            document.getElementById('formTitle').textContent = '📅 Novo Agendamento';
+            document.querySelector('.btn-save-agendamento').textContent = '💾 Salvar Configuração';
+            editingIndex = null;
+        }
+
+        // Exibir campos de áudio bidirecional
+        function toggleAudioFields(checkbox) {
+            const audioFields = document.getElementById('audioDestinatarioFields');
+            audioFields.style.display = checkbox.checked ? 'block' : 'none';
+        }
+
+        // Dual List - Ambientes
+        let selectedAvailableAmbItems = [];
+        let selectedSelectedAmbItems = [];
+
+        function selectItem(item, listType) {
+            if (listType === 'availableAmb') {
+                const index = selectedAvailableAmbItems.indexOf(item);
+                if (index > -1) {
+                    selectedAvailableAmbItems.splice(index, 1);
+                    item.classList.remove('selected');
+                } else {
+                    selectedAvailableAmbItems.push(item);
+                    item.classList.add('selected');
+                }
+            } else if (listType === 'selectedAmb') {
+                const index = selectedSelectedAmbItems.indexOf(item);
+                if (index > -1) {
+                    selectedSelectedAmbItems.splice(index, 1);
+                    item.classList.remove('selected');
+                } else {
+                    selectedSelectedAmbItems.push(item);
+                    item.classList.add('selected');
+                }
+            }
+        }
+
+        function moveAmbToSelected() {
+            const selectedList = document.getElementById('selectedAmbientesList');
+            selectedAvailableAmbItems.forEach(item => {
+                item.classList.remove('selected');
+                selectedList.appendChild(item);
+            });
+            selectedAvailableAmbItems = [];
+        }
+
+        function moveAllAmbToSelected() {
+            const availableList = document.getElementById('availableAmbientesList');
+            const selectedList = document.getElementById('selectedAmbientesList');
+            while (availableList.firstChild) {
+                selectedList.appendChild(availableList.firstChild);
+            }
+            selectedAvailableAmbItems = [];
+        }
+
+        function moveAmbToAvailable() {
+            const availableList = document.getElementById('availableAmbientesList');
+            selectedSelectedAmbItems.forEach(item => {
+                item.classList.remove('selected');
+                availableList.appendChild(item);
+            });
+            selectedSelectedAmbItems = [];
+        }
+
+        function moveAllAmbToAvailable() {
+            const availableList = document.getElementById('availableAmbientesList');
+            const selectedList = document.getElementById('selectedAmbientesList');
+            while (selectedList.firstChild) {
+                availableList.appendChild(selectedList.firstChild);
+            }
+            selectedSelectedAmbItems = [];
+        }
+
+        // Toggle button
+        function toggleActive(btn) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // Toggle seção colapsável
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const isVisible = content.style.display !== 'none';
+            
+            if (isVisible) {
+                content.style.display = 'none';
+                header.querySelector('span').textContent = header.querySelector('span').textContent.replace('▼', '▶');
+            } else {
+                content.style.display = 'block';
+                header.querySelector('span').textContent = header.querySelector('span').textContent.replace('▶', '▼');
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            const audioCheckbox = document.getElementById('audiobidirecional');
+            if (audioCheckbox) {
+                audioCheckbox.checked = true;
+                toggleAudioFields(audioCheckbox);
+            }
+
+            const tipoAcao = document.getElementById('tipoAcao');
+            if (tipoAcao) {
+                tipoAcao.value = 'agendado';
+                toggleAgendamentoFieldset(tipoAcao);
+            }
+        });
+    </script>
+</body>
+</html>
